@@ -9,7 +9,9 @@ def get_resource_path(relative_path):
     base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
     return os.path.join(base_path, relative_path)
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder=get_resource_path('backend/static'),
+            template_folder=get_resource_path('frontend'))
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
