@@ -1,36 +1,88 @@
-document.getElementById('pdfFiles').addEventListener('change', function () {
-  const files = this.files;
-  if (!files.length) return alert("No files selected!");
+const fileInput = document.getElementById("pdfFiles");
+const fileList = document.getElementById("fileList");
+const combineDownloadBtn = document.getElementById("combineDownloadBtn");
+const clearFilesBtn = document.getElementById("clearFilesBtn");
+const statusText = document.getElementById("status");
+
+let uploadedFiles = [];
+
+fileInput.addEventListener("change", async (event) => {
+  const files = event.target.files;
+  if (!files.length) return;
 
   const formData = new FormData();
-  for (const file of files) {
-      formData.append('pdfs', file);
+  for (let file of files) {
+    formData.append("pdfs", file);
   }
 
-  fetch('/upload', {
-      method: 'POST',
+  try {
+    const res = await fetch("/upload", {
+      method: "POST",
       body: formData,
-  })
-  .then(response => response.json())
-  .then(data => alert(data.message))
-  .catch(() => alert('Error uploading files.'));
+    });
+
+    if (!res.ok) {
+      throw new Error("Upload failed");
+    }
+
+    uploadedFiles = [...files];
+    updateFileList();
+  } catch (err) {
+    statusText.textContent = err.message;
+  }
 });
 
-document.getElementById('combineBtn').addEventListener('click', function () {
-  fetch('/combine', {
-      method: 'POST',
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.success) {
-          alert('PDFs successfully combined! Click download.');
-      } else {
-          alert(`Error: ${data.message}`);
-      }
-  })
-  .catch(() => alert('Error combining PDFs.'));
+combineDownloadBtn.addEventListener("click", async () => {
+  if (uploadedFiles.length === 0) {
+    statusText.textContent = "No files uploaded.";
+    return;
+  }
+
+  try {
+    const res = await fetch("/combine-and-download", {
+      method: "POST"
+    });
+
+    if (!res.ok) throw new Error("Failed to combine PDFs");
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "combined.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    statusText.textContent = err.message;
+  }
 });
 
-document.getElementById('downloadBtn').addEventListener('click', function () {
-  window.location.href = '/download';
+
+clearFilesBtn.addEventListener("click", async () => {
+  try {
+    const res = await fetch("/clear-files", {
+      method: "POST"
+    });
+
+    if (!res.ok) throw new Error("Failed to clear files");
+
+    uploadedFiles = [];
+    fileList.innerHTML = "";
+    statusText.textContent = "Uploaded files cleared.";
+  } catch (err) {
+    statusText.textContent = err.message;
+  }
 });
+
+
+
+function updateFileList() {
+  fileList.innerHTML = "";
+  uploadedFiles.forEach((file) => {
+    const li = document.createElement("li");
+    li.textContent = file.name;
+    fileList.appendChild(li);
+  });
+}
