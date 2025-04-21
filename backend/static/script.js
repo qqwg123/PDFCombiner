@@ -25,6 +25,7 @@ fileInput.addEventListener("change", async (event) => {
       throw new Error("Upload failed");
     }
 
+    statusText.textContent = ""; // Clear status on success
     uploadedFiles = [...files];
     updateFileList();
   } catch (err) {
@@ -59,7 +60,6 @@ combineDownloadBtn.addEventListener("click", async () => {
   }
 });
 
-
 clearFilesBtn.addEventListener("click", async () => {
   try {
     const res = await fetch("/clear-files", {
@@ -69,12 +69,14 @@ clearFilesBtn.addEventListener("click", async () => {
     if (!res.ok) throw new Error("Failed to clear files");
 
     uploadedFiles = [];
+    fileInput.value = ""; // Reset file input
     fileList.innerHTML = "";
     statusText.textContent = "Uploaded files cleared.";
   } catch (err) {
     statusText.textContent = err.message;
   }
 });
+
 
 
 

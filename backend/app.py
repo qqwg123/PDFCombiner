@@ -43,22 +43,25 @@ def upload():
 @app.route('/combine-and-download', methods=['POST'])
 def combine_and_download():
     pdf_files = sorted(
-    [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')],
-    key=lambda x: os.path.getmtime(os.path.join(UPLOAD_FOLDER, x))
-)
-
+        [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf') and f != 'combined.pdf'],
+        key=lambda x: os.path.getmtime(os.path.join(UPLOAD_FOLDER, x))
+    )
 
     if not pdf_files:
         return jsonify({'error': 'No PDF files uploaded'}), 400
 
+    output_path = os.path.join(UPLOAD_FOLDER, 'combined.pdf')
+    if os.path.exists(output_path):
+        os.remove(output_path)
+
     merger = PdfMerger()
     for filename in pdf_files:
         merger.append(os.path.join(UPLOAD_FOLDER, filename))
-    output_path = os.path.join(UPLOAD_FOLDER, 'combined.pdf')
     merger.write(output_path)
     merger.close()
 
     return send_file(output_path, as_attachment=True)
+
 
 @app.route('/clear-files', methods=['POST'])
 def clear_files():
