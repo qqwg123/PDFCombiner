@@ -1,67 +1,112 @@
 body {
-    font-family: sans-serif;
-    margin: 40px;
-  }
-  
-  input[type="file"] {
-    margin-bottom: 20px;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    padding: 10px;
-    background: #eee;
-    margin: 5px 0;
-    cursor: move;
-  }
-  
-  .drop-zone {
-    border: 2px dashed #ccc;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 20px;
-  }
-  
-  .drop-zone.dragover {
-    background-color: #f0f8ff;
-    border-color: #007bff;
-  }
-  
-  .container {
-    width: 90%;
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    border: 2px dashed #aaa;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-  }
-  
-  #pdfFiles {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    border: 2px dashed #ccc;
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
-  
-  ul#fileList {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 15px;
-  }
-  
-  ul#fileList li {
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #eee;
-    border-radius: 4px;
-    cursor: move;
-  }
-  
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 600;
+  color: #333;
+}
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  padding: 30px;
+  text-align: center;
+  border-radius: 10px;
+  background-color: #fafafa;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.drop-zone.dragover {
+  background-color: #e6f0ff;
+  border-color: #3399ff;
+  color: #000;
+}
+
+input[type="file"] {
+  display: none; /* Hide the ugly default input */
+}
+
+.drop-zone label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #007bff;
+}
+
+ul#fileList {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+}
+
+ul#fileList li {
+  padding: 10px 14px;
+  margin: 6px 0;
+  background-color: #f1f1f1;
+  border-radius: 6px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s;
+}
+
+ul#fileList li:hover {
+  background-color: #e3e3e3;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#combineDownloadBtn {
+  background-color: #007bff;
+  color: white;
+}
+
+#combineDownloadBtn:hover {
+  background-color: #005fcc;
+}
+
+#clearFilesBtn {
+  background-color: #f44336;
+  color: white;
+}
+
+#clearFilesBtn:hover {
+  background-color: #d32f2f;
+}
+
+#status {
+  text-align: center;
+  margin-top: 12px;
+  color: #d32f2f;
+  font-size: 14px;
+}
