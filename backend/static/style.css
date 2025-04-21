@@ -19,3 +19,16 @@ body {
     cursor: move;
   }
   
+  .drop-zone {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .drop-zone.dragover {
+    background-color: #f0f8ff;
+    border-color: #007bff;
+  }
+  

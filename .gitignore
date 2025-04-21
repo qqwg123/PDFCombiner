@@ -1,2 +1,5 @@
 uploads/
 venv/
+app.spec
+build/
+dist/
