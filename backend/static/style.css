@@ -32,3 +32,36 @@ body {
     border-color: #007bff;
   }
   
+  .container {
+    width: 90%;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 2px dashed #aaa;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  #pdfFiles {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed #ccc;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  ul#fileList {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 15px;
+  }
+  
+  ul#fileList li {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #eee;
+    border-radius: 4px;
+    cursor: move;
+  }
+  

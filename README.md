@@ -2,6 +2,11 @@
 
 A simple web app to upload, combine, and download PDFs using Flask + PyPDF2.
 
+Folder Structure
+backend/ - Flask backend and upload logic, also static CSS/JS interface
+
+frontend/ - HTML
+
 ## 🔧 Setup
 
 1. Clone the repo:
@@ -31,7 +36,14 @@ python backend/app.py
 
 The app will open at http://127.0.0.1:5000
 
-Folder Structure
-backend/ - Flask backend and upload logic, also static CSS/JS interface
 
-frontend/ - HTML
+5. Create an executable:
+```bash
+pip install pyinstaller
+# Windows
+pyinstaller --onefile --add-data "frontend/index.html;frontend" --add-data "backend/static;backend/static" backend/app.py
+#macOS/Linux
+pyinstaller --onefile --add-data "frontend/index.html:frontend" --add-data "backend/static:backend/static" backend/app.py
+```
+
+The executable will be in dist/

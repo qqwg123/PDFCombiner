@@ -4,7 +4,17 @@ import sys
 from werkzeug.utils import secure_filename
 from PyPDF2 import PdfMerger
 
+def get_resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+
 app = Flask(__name__)
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_file(get_resource_path(os.path.join('backend', 'static', filename)))
+
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -20,21 +30,11 @@ for filename in os.listdir(UPLOAD_FOLDER):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_resource_path(relative_path):
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
-
 @app.route('/')
 def index():
     html_path = get_resource_path(os.path.join('frontend', 'index.html'))
     with open(html_path, 'r', encoding='utf-8') as f:
         return render_template_string(f.read())
-    
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    return send_file(get_resource_path(os.path.join('frontend', 'static', filename)))
-
 
 @app.route('/upload', methods=['POST'])
 def upload():
