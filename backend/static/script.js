@@ -71,6 +71,8 @@ function updateFileList() {
   fileList.innerHTML = "";
   uploadedFiles.forEach((file, index) => {
     const li = document.createElement("li");
+    li.setAttribute("data-index", index);
+    li.innerHTML = `<span class="icon">📄</span> ${file.name}`;
     li.textContent = file.name;
     li.draggable = true;
     li.dataset.index = index;
