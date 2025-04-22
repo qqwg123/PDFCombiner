@@ -19,6 +19,14 @@ combineDownloadBtn.addEventListener("click", async () => {
     return;
   }
 
+  if (uploadedFiles.length === 1) {
+    statusText.textContent = "You need at least 2 PDF files to combine.";
+    return;
+  }
+
+  // Show "combining" status
+  statusText.textContent = "Combining PDFs...";
+  
   try {
     const filenames = uploadedFiles.map((file) => file.name);
 
@@ -30,7 +38,10 @@ combineDownloadBtn.addEventListener("click", async () => {
       body: JSON.stringify({ filenames })
     });
 
-    if (!res.ok) throw new Error("Failed to combine PDFs");
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to combine PDFs");
+    }
 
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
@@ -41,14 +52,21 @@ combineDownloadBtn.addEventListener("click", async () => {
     a.click();
     a.remove();
     window.URL.revokeObjectURL(url);
+    
+    // Success message
+    statusText.textContent = "PDFs combined successfully!";
+    setTimeout(() => {
+      statusText.textContent = "";
+    }, 10000);
   } catch (err) {
     statusText.textContent = err.message;
   }
 });
 
-
 clearFilesBtn.addEventListener("click", async () => {
   try {
+    statusText.textContent = "Clearing files...";
+    
     const res = await fetch("/clear-files", {
       method: "POST"
     });
@@ -64,52 +82,93 @@ clearFilesBtn.addEventListener("click", async () => {
   }
 });
 
-
-
-
 function updateFileList() {
   fileList.innerHTML = "";
+  
+  if (uploadedFiles.length === 0) {
+    fileList.innerHTML = "<li class='empty-list'>No files added yet</li>";
+    return;
+  }
+  
   uploadedFiles.forEach((file, index) => {
     const li = document.createElement("li");
     li.setAttribute("data-index", index);
-    li.innerHTML = `<span class="icon">📄</span> ${file.name}`;
-    li.textContent = file.name;
+    
+    // File info container
+    const fileInfo = document.createElement("div");
+    fileInfo.className = "file-info";
+    
+    // PDF icon
+    const icon = document.createElement("span");
+    icon.className = "icon";
+    icon.textContent = "📄";
+    fileInfo.appendChild(icon);
+    
+    // File name
+    const fileName = document.createElement("span");
+    fileName.className = "file-name";
+    fileName.textContent = file.name;
+    fileName.title = file.name; // Show full name on hover
+    fileInfo.appendChild(fileName);
+    
+    // Add file size
+    const fileSize = document.createElement("span");
+    fileSize.className = "file-size";
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.appendChild(fileSize);
+    
+    li.appendChild(fileInfo);
+    
+    // Actions container
+    const actions = document.createElement("div");
+    actions.className = "file-actions";
+    
+    // Delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-file";
+    deleteBtn.innerHTML = "×";
+    deleteBtn.title = "Remove file";
+    deleteBtn.addEventListener("click", () => {
+      uploadedFiles.splice(index, 1);
+      updateFileList();
+    });
+    actions.appendChild(deleteBtn);
+    
+    li.appendChild(actions);
+    
+    // Drag functionality
     li.draggable = true;
-    li.dataset.index = index;
-
-    // Drag events
+    
     li.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", index);
     });
 
     li.addEventListener("dragover", (e) => {
       e.preventDefault();
-      li.style.borderTop = "2px solid #007bff";
+      li.classList.add("drag-over");
     });
 
     li.addEventListener("dragleave", () => {
-      li.style.borderTop = "";
+      li.classList.remove("drag-over");
     });
 
     li.addEventListener("drop", (e) => {
       e.preventDefault();
-      li.style.borderTop = "";
+      li.classList.remove("drag-over");
 
       const fromIndex = parseInt(e.dataTransfer.getData("text/plain"));
       const toIndex = index;
-
-      const movedItem = uploadedFiles.splice(fromIndex, 1)[0];
-      uploadedFiles.splice(toIndex, 0, movedItem);
-
-      updateFileList();
+      
+      if (fromIndex !== toIndex) {
+        const movedItem = uploadedFiles.splice(fromIndex, 1)[0];
+        uploadedFiles.splice(toIndex, 0, movedItem);
+        updateFileList();
+      }
     });
 
     fileList.appendChild(li);
   });
 }
-
-
-
 
 dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
@@ -126,22 +185,44 @@ dropZone.addEventListener("drop", (e) => {
   handleFiles(e.dataTransfer.files);
 });
 
-fileInput.addEventListener("change", (e) => {
-  handleFiles(e.target.files);
-});
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 
 async function handleFiles(fileListFromInput) {
   const newFileArray = Array.from(fileListFromInput);
+  
+  // Filter for PDF files only
+  const pdfFiles = newFileArray.filter(file => 
+    file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+  );
+  
+  if (pdfFiles.length === 0) {
+    statusText.textContent = "Please select PDF files only.";
+    return;
+  }
+  
+  if (newFileArray.length !== pdfFiles.length) {
+    statusText.textContent = "Some non-PDF files were skipped.";
+  }
 
   // Filter out duplicates by filename
-  const uniqueNewFiles = newFileArray.filter(newFile =>
+  const uniqueNewFiles = pdfFiles.filter(newFile =>
     !uploadedFiles.some(existing => existing.name === newFile.name)
   );
 
   if (uniqueNewFiles.length === 0) {
-    statusText.textContent = "Some files were already added and were skipped.";
+    statusText.textContent = "These files were already added and were skipped.";
     return;
   }
+
+  statusText.textContent = "Uploading files...";
 
   const formData = new FormData();
   for (let file of uniqueNewFiles) {
@@ -158,9 +239,18 @@ async function handleFiles(fileListFromInput) {
 
     uploadedFiles = [...uploadedFiles, ...uniqueNewFiles];
     updateFileList();
-    statusText.textContent = "";
+    statusText.textContent = `${uniqueNewFiles.length} file(s) uploaded successfully.`;
+    
+    // Clear success message after a few seconds
+    setTimeout(() => {
+      if (statusText.textContent.includes("uploaded successfully")) {
+        statusText.textContent = "";
+      }
+    }, 10000);
   } catch (err) {
     statusText.textContent = err.message;
   }
 }
 
+// Initialize file list in case there are any
+updateFileList();

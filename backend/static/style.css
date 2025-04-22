@@ -1,5 +1,5 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
   margin: 0;
   background-color: #1e1e2f;
   color: #f0f0f5;
@@ -7,6 +7,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 20px;
 }
 
 .container {
@@ -33,6 +34,11 @@ h1 {
   background-color: #292944;
   margin-bottom: 20px;
   transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.drop-zone:hover {
+  border-color: #4a90e2;
 }
 
 .drop-zone.dragover {
@@ -41,41 +47,96 @@ h1 {
 }
 
 input[type="file"] {
-  display: none; /* hide file input, just use drop-zone text */
-}
-
-#pdfFiles {
-  border: none;
-  background: transparent;
-  color: #ddd;
-  width: 100%;
-  padding: 0;
+  display: none;
 }
 
 ul#fileList {
   list-style: none;
   padding-left: 0;
   margin-top: 15px;
+  background-color: #292944;
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+ul#fileList .empty-list {
+  padding: 15px;
+  text-align: center;
+  color: #aaaab5;
+  font-style: italic;
 }
 
 ul#fileList li {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  margin: 6px 0;
   background-color: #3a3a55;
-  border-radius: 8px;
+  border-bottom: 1px solid #444458;
   cursor: grab;
   transition: background-color 0.2s ease;
+}
+
+ul#fileList li:last-child {
+  border-bottom: none;
 }
 
 ul#fileList li:hover {
   background-color: #4a4a6d;
 }
 
-ul#fileList li span.icon {
+ul#fileList li.drag-over {
+  border-top: 2px solid #4a90e2;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.icon {
   margin-right: 10px;
-  color: #aaa;
+  color: #aaaab5;
+}
+
+.file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #aaaab5;
+}
+
+.file-actions {
+  display: flex;
+  align-items: center;
+}
+
+.delete-file {
+  background: transparent;
+  border: none;
+  color: #aaaab5;
+  font-size: 18px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-file:hover {
+  color: #ff5252;
 }
 
 button {
@@ -101,4 +162,5 @@ button:hover {
   color: #ff6b6b;
   text-align: center;
   font-size: 14px;
+  min-height: 20px;
 }

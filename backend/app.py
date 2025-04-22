@@ -54,6 +54,24 @@ def upload():
 
     return 'Files uploaded successfully'
 
+@app.route('/remove-file', methods=['POST'])
+def remove_file():
+    # This endpoint is optional - if a file doesn't exist, we'll just continue
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        
+        if filename:
+            safe_filename = secure_filename(filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], safe_filename)
+            
+            if os.path.exists(file_path):
+                os.remove(file_path)
+    except Exception:
+        pass
+        
+    return jsonify({'message': 'Processed'})
+
 @app.route('/combine-and-download', methods=['POST'])
 def combine_and_download():
     data = request.get_json()

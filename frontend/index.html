@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Combiner</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
@@ -15,11 +16,11 @@
       <input type="file" id="pdfFiles" multiple accept=".pdf" />
     </div>
     
-    
-  
+    <!-- File list -->
     <ul id="fileList"></ul>
+    
     <button id="combineDownloadBtn">Combine & Download</button>
-    <p id="status" style="color: red;"></p>
+    <p id="status"></p>
     <button id="clearFilesBtn">Clear Uploaded Files</button>
   </div>
   
