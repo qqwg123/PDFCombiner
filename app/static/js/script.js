@@ -265,7 +265,6 @@ async function handleFiles(fileListFromInput) {
 
     uploadedFiles = [...uploadedFiles, ...uniqueNewFiles];
     updateFileList();
-    statusText.textContent = `${uniqueNewFiles.length} file(s) uploaded successfully.`;
     
     // Clear success message after a few seconds
     updateStatus(`${uniqueNewFiles.length} file(s) uploaded successfully.`, "success", 10000);
