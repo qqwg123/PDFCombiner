@@ -157,10 +157,27 @@ button:hover {
   background-color: #357ab7;
 }
 
+/* Additional CSS for status messages */
 #status {
   margin-top: 12px;
-  color: #ff6b6b;
   text-align: center;
   font-size: 14px;
   min-height: 20px;
+  transition: color 0.3s ease;
+}
+
+#status.error {
+  color: #ff6b6b;
+}
+
+#status.success {
+  color: #66e080;
+}
+
+#status.info {
+  color: #4a90e2;
+}
+
+#status.warning {
+  color: #ffbe3d;
 }

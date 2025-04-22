@@ -7,6 +7,35 @@ const dropZone = document.getElementById("dropZone");
 
 let uploadedFiles = [];
 
+/**
+ * Updates the status message with appropriate styling
+ * @param {string} message - The message to display
+ * @param {string} type - The type of message ('success', 'error', 'info', 'warning')
+ * @param {number} timeout - Time in ms before message disappears (0 = no timeout)
+ */
+function updateStatus(message, type = 'info', timeout = 0) {
+  const statusText = document.getElementById("status");
+  
+  // Remove all existing classes
+  statusText.classList.remove('error', 'success', 'info', 'warning');
+  
+  // Add the appropriate class
+  statusText.classList.add(type);
+  
+  // Set the message text
+  statusText.textContent = message;
+  
+  // Clear after timeout if specified
+  if (timeout > 0) {
+    setTimeout(() => {
+      if (statusText.textContent === message) {
+        statusText.textContent = "";
+        statusText.classList.remove('error', 'success', 'info', 'warning');
+      }
+    }, timeout);
+  }
+}
+
 fileInput.addEventListener("change", (e) => {
   handleFiles(e.target.files);
   // Reset the input so selecting same files again will re-trigger 'change'
@@ -15,17 +44,17 @@ fileInput.addEventListener("change", (e) => {
 
 combineDownloadBtn.addEventListener("click", async () => {
   if (uploadedFiles.length === 0) {
-    statusText.textContent = "No files uploaded.";
+    updateStatus("No files uploaded.", "warning");
     return;
   }
-
+  
   if (uploadedFiles.length === 1) {
-    statusText.textContent = "You need at least 2 PDF files to combine.";
+    updateStatus("You need at least 2 PDF files to combine.", "warning");
     return;
   }
 
   // Show "combining" status
-  statusText.textContent = "Combining PDFs...";
+  updateStatus("Combining PDFs...", "info");
   
   try {
     const filenames = uploadedFiles.map((file) => file.name);
@@ -54,18 +83,15 @@ combineDownloadBtn.addEventListener("click", async () => {
     window.URL.revokeObjectURL(url);
     
     // Success message
-    statusText.textContent = "PDFs combined successfully!";
-    setTimeout(() => {
-      statusText.textContent = "";
-    }, 10000);
+    updateStatus("PDFs combined successfully!", "success", 10000);
   } catch (err) {
-    statusText.textContent = err.message;
+    updateStatus(err.message, "error");
   }
 });
 
 clearFilesBtn.addEventListener("click", async () => {
   try {
-    statusText.textContent = "Clearing files...";
+    updateStatus("Clearing files...", "info");
     
     const res = await fetch("/clear-files", {
       method: "POST"
@@ -76,9 +102,9 @@ clearFilesBtn.addEventListener("click", async () => {
     uploadedFiles = [];
     fileInput.value = ""; // Reset file input
     fileList.innerHTML = "";
-    statusText.textContent = "Uploaded files cleared.";
+    updateStatus("Uploaded files cleared.", "success", 5000);
   } catch (err) {
-    statusText.textContent = err.message;
+    updateStatus(err.message, "error");
   }
 });
 
@@ -204,12 +230,12 @@ async function handleFiles(fileListFromInput) {
   );
   
   if (pdfFiles.length === 0) {
-    statusText.textContent = "Please select PDF files only.";
+    updateStatus("Please select PDF files only.", "error");
     return;
   }
   
   if (newFileArray.length !== pdfFiles.length) {
-    statusText.textContent = "Some non-PDF files were skipped.";
+    updateStatus("Some non-PDF files were skipped.", "warning");
   }
 
   // Filter out duplicates by filename
@@ -218,11 +244,11 @@ async function handleFiles(fileListFromInput) {
   );
 
   if (uniqueNewFiles.length === 0) {
-    statusText.textContent = "These files were already added and were skipped.";
+    updateStatus("These files were already added and were skipped.", "warning");
     return;
   }
 
-  statusText.textContent = "Uploading files...";
+  updateStatus("Uploading files...", "info");
 
   const formData = new FormData();
   for (let file of uniqueNewFiles) {
@@ -242,13 +268,9 @@ async function handleFiles(fileListFromInput) {
     statusText.textContent = `${uniqueNewFiles.length} file(s) uploaded successfully.`;
     
     // Clear success message after a few seconds
-    setTimeout(() => {
-      if (statusText.textContent.includes("uploaded successfully")) {
-        statusText.textContent = "";
-      }
-    }, 10000);
+    updateStatus(`${uniqueNewFiles.length} file(s) uploaded successfully.`, "success", 10000);
   } catch (err) {
-    statusText.textContent = err.message;
+    updateStatus(err.message, "error");
   }
 }
 

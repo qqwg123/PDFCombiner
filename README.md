@@ -47,3 +47,22 @@ pyinstaller --onefile --add-data "frontend/index.html:frontend" --add-data "back
 ```
 
 The executable will be in dist/
+
+## 🧹 Cleaning Up
+
+To clean temporary files and build artifacts:
+
+```bash
+python clean.py
+```
+
+This will clean:
+- PDF files in backend/uploads/
+- build/ directory
+- dist/ directory
+- app.spec file
+
+Add `-v` flag for verbose output:
+```bash
+python clean.py -v
+```
